@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+
+<head>
+    <meta charset="utf8">
+    <link rel="icon" type="image/svg" href="/3an-fire-fit.svg">
+    <!--seo-->
+    <meta name="title" content="Anonymous asking and answering network">
+    <meta name="description"
+        content="Anyone can asking and answering using 3AN network. It's completely opensource and free. Build your own asking network now.">
+    <meta name="keywords" content="anonymous, Q&A, social">
+    <meta name="robots" content="index, nofollow">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta name="language" content="English">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <style>
+        /* Chrome, Safari, Edge, Opera */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* Firefox */
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="col-sm-6 col-sm-offset-3 text-center align-middle" style="margin-top:10%;">
+        <div class="panel panel-primary">
+            <header class="panel-heading">Enter your 2FA code here:</header>
+            <div class="panel-body">
+                <main>
+                    <form action="verify.php" method="post">
+                        <label for="code">2FA code:</label>
+                        <input name="code" id="code" autocomplete="one-time-code" required pattern="[0-9]" inputmode="numeric" type="number"
+                            maxlength="12" minlength="12"></input>
+                        <button type="submit">Submit</button>
+                </main>
+    
+            </div>
+            <div class="panel-footer">
+                <footer>Made By lapsangsouchong</footer>
+            </div>
+        </div>
+    </div>
+</body>

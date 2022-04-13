@@ -1,0 +1,22 @@
+<?php
+$notice="This is the network that allows you to ask and answer other's qusetion freely. Made with security.";
+$anon="Anonymous";
+$clear="Clear";
+$submit="Submit";
+$name="The anonymous asking and answer network (3AN)";
+$authsys="User auth system";
+$logout="Logout";
+$myaccount="My account";
+$dashboard="Dashboard";
+$error="<strong>Error!</strong> Sorry, something went wrong.";
+$success="<strong>Success!</strong> Your reply have been sent to our server. Please refresh the page to see the answer.";
+$footer="Made by lapsang souchong. <a href='https://theij.gitbook.io/anytalkonym-docs/'>Docs</a>";
+$login="Login";
+$remeberwarn="Due to security, if you are using remeber me function, please <b>do not</b> change the password in password field. <b>Just submit it.</b>";
+$username="Username";
+$password="Password";
+$passrecover="Password recover";
+$remeberme="Remeber me";
+$noaccount="Don't have an account!? <a href='register.php'>Register</a> here.";
+$signup="Signup";
+$forgotpass="Password recovery";
