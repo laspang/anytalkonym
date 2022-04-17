@@ -30,12 +30,12 @@ if ($db_bundle) {
     exit(1);
 }
 flush();
-    ob_flush();
+ob_flush();
 
 breakline();
 echo "SMTP check<br>";
 flush();
-    ob_flush();
+ob_flush();
 
 breakline();
 $mail = new PHPMailer(true);
@@ -69,12 +69,12 @@ try {
     exit(1);
 }
 flush();
-    ob_flush();
+ob_flush();
 
 breakline();
 echo "Start config database<br>";
 flush();
-    ob_flush();
+ob_flush();
 
 breakline();
 $sqlquery="
@@ -91,7 +91,6 @@ CREATE TABLE \"public\".\"user\" (
     \"gender\" character varying(50),
     \"mobile\" character varying(50),
     \"designation\" character varying(50),
-    \"image\" character varying(250),
     \"type\" character varying(250) DEFAULT 'general' NOT NULL,
     \"status\" character varying(30) DEFAULT 'pending' NOT NULL,
     \"authtoken\" character varying(255) NOT NULL,
@@ -110,7 +109,7 @@ if ($result1) {
     exit(1);
 }
 flush();
-    ob_flush();
+ob_flush();
 
 $sqlquery='DROP TABLE IF EXISTS "answer";
 DROP SEQUENCE IF EXISTS answer_aid_seq;
@@ -132,7 +131,7 @@ if ($result2) {
     exit(1);
 }
 flush();
-    ob_flush();
+ob_flush();
 
 $sqlquery='DROP TABLE IF EXISTS "content";
 DROP SEQUENCE IF EXISTS content_id_seq;
@@ -187,6 +186,15 @@ flush();
     ob_flush();
 
 breakline();
+//gen random words
+$str=("1234567890qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM");
+        $i=1;
+        $word="";
+        while ($i<=64) {
+            $word .=substr($str, rand(0, 62), 1);
+            $i+=1;
+        }
+
 $myfile = fopen("../settings.php", "w") or die("Unable to open file!");
 flush();
     ob_flush();
@@ -227,17 +235,19 @@ $smtp_username, $smtp_password if $smtp_auth is true then you need to fill it.
 $smtp_sendername the name you want :-)
 */
 $smtp_hostname="'.$smtphostname.'";
+$smtp_auth="'.$smtpauth.'";
 $smtp_port='.$smtpport.';
-$smtp_auth=true;
+$smtp_authme=true;
 $smtp_username="'.$smtpusername.'";
 $smtp_password="'.$smtppassword.'";
+$smtp_senderaddress="'.$_POST["smtpemail"].'";
 $smtp_sendername="Anytalkonym system notification helper";
 
 /*DO NOT CHANGE THE CONTENT HERE
 unless you know what you are doing
 changing these content might caught a big problem
 PLEASE THINK BEFORE YOU TYPE*/
-$key = "";
+$key = "'.$word.'";
 //$key is a server key that can encrypt password if you use save password option, this must be a random string.
 ';//syntax here
 fwrite($myfile, $txt);

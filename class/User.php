@@ -110,13 +110,11 @@ class User extends Dbconfig
                             list($encrypted_data, $iv) = explode('::', base64_decode($garble), 2);
                             return openssl_decrypt($encrypted_data, 'aes-256-cbc', $key, 0, $iv);
                         }
-                        //seek a security expert for advice
-                        $key = "WtXty4H_bHP9QV!Yg%d^A8E%b7YnZFaG_uMUqqCLq_qtvLu^q$#7VtW!?YcqmrpKxzQ@bnTC#BDYu*gau!P*X3R77J7&mRZRfMaU6VR=4A*v6j8y3A=ZLU^59JKsc*S7Cpr49Qp9h^$6j2qa*tM8yj*_Ztm-Bpkpw7My=k$@yTh!%9k_QJPx%-j4z=_7WWb?g9njrF2DZ9MJyFhFey@+Kj&psG@38xy586#x%yk-%XX@=5e?g8Rz&b&&HQs?V";
-                        if (isset($_COOKIE["loginPass"]) && $_COOKIE["loginPass"] == $password) {//double varibale?
+                                            if (isset($_COOKIE["loginPass"]) && $_COOKIE["loginPass"] == $password) {
                             $password =decrypt($key, $_COOKIE["loginPass"]) ;
                         } else {
-                            $password = $password;//cannot get purpose don't read the code fetching password for auto log in
-                            //Use login password or cokokies password, if cokkies password was set, use cookies instead of user input
+                            $password = $password;
+                            
                         }
                         $sqlQuery = "SELECT * FROM \"".$this->userTable."\"
 				WHERE email='".$loginId."' AND status = 'active'";
@@ -231,20 +229,23 @@ class User extends Dbconfig
                                 $mail = new PHPMailer(true);
 
                                 try {
-                                    //Server settings
-                                    //$mail->SMTPDebug = SMTP::DEBUG_SERVER;
-                                    $mail->isSMTP();                                            
-                                    $mail->Host       = 'smtp.office365.com';                     
-                                    $mail->SMTPAuth   = true;                                  
-                                    $mail->Username   = '';                    
-                                    $mail->Password   = '';                               
-                                    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;            //Enable implicit TLS encryption
-                                    $mail->Port       = 587;                                             //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
+                                    switch ($smtp_auth) {
+      case "SMTPS":    $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;break;
+      case "STARTTLS":    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;break;
+      case "none":    $mail->SMTPSecure = false;break;
+      
+    }
+                                    $mail->isSMTP();
+                                    $mail->Host       = $smtp_hostname;
+                                    $mail->SMTPAuth   = $smtp_authme;
+                                    $mail->Username   = $smtp_username;
+                                    $mail->Password   = $smtp_password;
+                                    $mail->Port       = $smtp_port;
                                     //Recipients
-                                    $mail->setFrom('', 'SMTP');
-                                    $mail->addAddress($_POST["email"], $_POST['firstname'].' '.$_POST['lastname']);    
+                                    $mail->setFrom($smtp_senderaddress, $smtp_sendername);
+                                    $mail->addAddress($_POST["email"], $_POST['firstname'].' '.$_POST['lastname']);
                                     //Content
-                                    $mail->isHTML(false);                                  
+                                    $mail->isHTML(false);
                                     $link = "<".$servername."/verify.php?authtoken=".$authtoken.">Verify Email";
                                     $mail->Subject = 'Verify email to complete registration';
                                     $mail->Body    = 'Hi there, click on this '.$link.' to verify email to complete registration.';
@@ -258,7 +259,7 @@ class User extends Dbconfig
                                 $message = "User register request failed.";
                             }
                         } else {
-                            $message= "Invailed email";
+                            $message= "Invalided email";
                         }
                     }
                 }
@@ -287,7 +288,7 @@ class User extends Dbconfig
             $isValid = pg_num_rows($resultSet);
             if ($isValid) {
                 $userDetails = pg_fetch_assoc($resultSet);
-                if ($_GET["authtoken"]) {//i am so smart
+                if ($_GET["authtoken"]) {
                     $updateQuery = "UPDATE \"".$this->userTable."\" SET status = 'active'
 						WHERE id='".$userDetails['id']."'";
                     $isUpdated = pg_query($coninfo, $updateQuery);
@@ -351,21 +352,26 @@ class User extends Dbconfig
                 $re = pg_query($coninfo, $sql);//skip result only should be great
                 require 'vendor/autoload.php';
                 $mail = new PHPMailer(true);
-                //$mail->SMTPDebug = SMTP::DEBUG_SERVER;                      //Enable verbose debug output
+                
                 try {
-                    $mail->isSMTP();                                            
-                    $mail->Host       = 'smtp.office365.com';                     
-                    $mail->SMTPAuth   = true;                                  
-                    $mail->Username   = '';                    
-                    $mail->Password   = '';                               
-                    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;            //Enable implicit TLS encryption
-                    $mail->Port       = 587;                                    //TCP port to connect to; use 587 if you have set `SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS`
-
+                    switch ($smtp_auth) {
+      case "SMTPS":    $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;break;
+      case "STARTTLS":    $mail->SMTPSecure = PHPMailer::ENCRYPTION_STARTTLS;break;
+      case "none":    $mail->SMTPSecure = false;break;
+      
+    }
+                    $mail->isSMTP();
+                    $mail->Host       = $smtp_hostname;
+                    $mail->SMTPAuth   = $smtp_authme;
+                    $mail->Username   = $smtp_username;
+                    $mail->Password   = $smtp_password;
+                    $mail->Port       = $smtp_port;
                     //Recipients
-                    $mail->setFrom('', 'ij SMTP');
-                    $mail->addAddress($user['email'], $_POST['firstname'].' '.$_POST['lastname']);    
+                    $mail->setFrom($smtp_senderaddress, $smtp_sendername);
+
+                    $mail->addAddress($user['email'], $_POST['firstname'].' '.$_POST['lastname']);
                     //Content
-                    $mail->isHTML(false);                                  
+                    $mail->isHTML(false);
                     $link="<".$servername."/reset_password.php?authtoken=".$authtoken.">Reset Password";
                     $mail->Subject = 'Reset your password on examplesite.com';
                     $mail->Body    = "Hi there, click on this ".$link." to reset your password.";
@@ -465,7 +471,6 @@ class User extends Dbconfig
             $userRows[] = '<button type="button" name="update" id="'.$users["id"].'" class="btn btn-warning btn-xs update">Update</button>';
             $userRows[] = '<button type="button" name="delete" id="'.$users["id"].'" class="btn btn-danger btn-xs delete" >Delete</button>';
             $userData[] = $userRows;
-            //wish to add $userRows[] = $users['username']; before button...  but that will be a error and might exceed the data
         }
         $output = array(
             "draw"				=>	intval($_POST["draw"]),
@@ -498,7 +503,7 @@ class User extends Dbconfig
     public function updateUser()
     {
         $coninfo = pg_connect("host=$this->hostName user=$this->userName password=$this->password dbname=$this->dbName sslmode=require");
-        if ($_POST['userid']) {//front end need to change too.
+        if ($_POST['userid']) {
             $updateQuery = "UPDATE \"".$this->userTable."\"
 			SET username= '".$_POST['username']."'first_name = '".$_POST["firstname"]."', last_name = '".$_POST["lastname"]."', email = '".$_POST["email"]."', mobile = '".$_POST["mobile"]."' , designation = '".$_POST["designation"]."', gender = '".$_POST["gender"]."', status = '".$_POST["status"]."', type = '".$_POST['user_type']."'
 			WHERE id ='".$_POST["userid"]."'";
@@ -536,7 +541,7 @@ class User extends Dbconfig
     {
         $coninfo = pg_connect("  host=$this->hostName user=$this->userName password=$this->password dbname=$this->dbName sslmode=require");
         if ($_POST["email"]) {
-            $authtoken = $this->getAuthtoken($_POST['email']);//fornt end!!!!!!!
+            $authtoken = $this->getAuthtoken($_POST['email']);
             $insertQuery = "INSERT INTO \"".$this->userTable."\"(username,first_name, last_name, email, gender, password, mobile, designation, type, status, authtoken)
 				VALUES ('".$_POST['username']."''".$_POST["firstname"]."', '".$_POST["lastname"]."', '".$_POST["email"]."', '".$_POST["gender"]."', '".password_hash($_POST["password"], PASSWORD_DEFAULT)."', '".$_POST["mobile"]."', '".$_POST["designation"]."', '".$_POST['user_type']."', 'active', '".$authtoken."')";
             $userSaved = pg_query($coninfo, $insertQuery);
@@ -597,14 +602,12 @@ class User extends Dbconfig
     }
     public function gentotp($id)
     {
-        // $coninfo = pg_connect("host=$this->hostName user=$this->userName password=$this->password dbname=$this->dbName sslmode=require");
+       
         require '../vendor/autoload.php';
         $secret=trim(Base32::encodeUpper(random_bytes(128)), '=');
         $totp = TOTP::create($secret, 30, 'sha1', 10);
-        // $sqlQuery="UPDATE \"user\" SET \"TOTPenable\"=true, \"TOTP\"='$secret' WHERE id='$id'";//expect postresql error here due to SET value have to use quote
-        // $go=pg_query($coninfo,$sqlQuery);
         $_SESSION["gentotp"]=$secret;
-        $totp->setLabel('anytalkonym user'); // The label (string)
+        $totp->setLabel('anytalkonym user'); 
         $totp->setIssuer('3AN Service');
         $grCodeUri = $totp->getQrCodeUri(
             'https://api.qrserver.com/v1/create-qr-code/?data=[DATA]&size=300x300&ecc=M',
@@ -623,10 +626,10 @@ class User extends Dbconfig
         $totp = TOTP::create($secret, 30, 'sha1', 10);
         var_dump($totp->now());
         if ($totp->now()==$code) {
-            $sqlQuery="UPDATE \"user\" SET \"TOTPenable\"=true, \"TOTP\"='$session' WHERE id='$id'";//expect postresql error here due to SET value have to use quote
+            $sqlQuery="UPDATE \"user\" SET \"TOTPenable\"=true, \"TOTP\"='$session' WHERE id='$id'";
             $go=pg_query($coninfo, $sqlQuery);
             if ($go) {
-                $_SESSION['gentotp']="";//for security reason
+                $_SESSION['gentotp']="";
                 echo "good";
             } else {
                 echo "SERVER INTERNEL ERROR";
@@ -720,7 +723,6 @@ class User extends Dbconfig
         $rresult=pg_fetch_row($result);
         return $rresult[0];
     }
-    //邏輯細胞死亡中...
     public function updatebio($bio, $userid)
     {
         $coninfo = pg_connect("host=$this->hostName user=$this->userName password=$this->password dbname=$this->dbName sslmode=require");
