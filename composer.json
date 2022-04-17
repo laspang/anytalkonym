@@ -1,6 +1,6 @@
 {
     "require": {
-        "phpmailer/phpmailer": "^6.5",
+        "phpmailer/phpmailer": "^6.6",
         "spomky-labs/otphp": "^10.0",
         "erusev/parsedown": "^1.7",
         "ext-memcached": "^3.1"

@@ -1,3 +1,4 @@
 /vendor/
 /admin/
 adminsql.php
+composer.lock
